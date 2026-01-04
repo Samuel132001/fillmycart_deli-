@@ -20,43 +20,43 @@ interface HomeScreenProps {
 const PRODUCT_IMAGES: { [key: string]: any } = {
   // Dairy & Refrigerated - milk image
   '1': require('../../assets/products/milk.jpeg'),
-  '2': require('../../assets/products/milk.jpeg'),
+  '2': require('../../assets/products/cheese.jpeg'),
   '3': require('../../assets/products/yogurt.jpeg'),
   
   // Bakery - bread image
   '4': require('../../assets/products/bread.jpeg'),
-  '5': require('../../assets/products/bread.jpeg'),
-  '6': require('../../assets/products/bread.jpeg'),
+  '5': require('../../assets/products/croissant.jpeg'),
+  '6': require('../../assets/products/cake.jpeg'),
   
   // Pantry/Dry Goods - yogurt as substitute
-  '7': require('../../assets/products/yogurt.jpeg'),
-  '8': require('../../assets/products/yogurt.jpeg'),
+  '7': require('../../assets/products/rice.jpeg'),
+  '8': require('../../assets/products/pasta.jpeg'),
   '9': require('../../assets/products/yogurt.jpeg'),
   
   // Beverages - milk image
-  '10': require('../../assets/products/milk.jpeg'),
-  '11': require('../../assets/products/milk.jpeg'),
-  '12': require('../../assets/products/milk.jpeg'),
+  '10': require('../../assets/products/fruitop.jpeg'),
+  '11': require('../../assets/products/ricoffy.jpeg'),
+  '12': require('../../assets/products/quickbrew.jpeg'),
   
   // Snacks - bread image
-  '13': require('../../assets/products/bread.jpeg'),
-  '14': require('../../assets/products/bread.jpeg'),
-  '15': require('../../assets/products/bread.jpeg'),
+  '13': require('../../assets/products/chipsy.jpeg'),
+  '14': require('../../assets/products/cookies.jpeg'),
+  '15': require('../../assets/products/popcorns.jpeg'),
   
   // Health & Beauty - yogurt image
-  '16': require('../../assets/products/yogurt.jpeg'),
-  '17': require('../../assets/products/yogurt.jpeg'),
-  '18': require('../../assets/products/yogurt.jpeg'),
+  '16': require('../../assets/products/nivea.jpeg'),
+  '17': require('../../assets/products/colgate.jpeg'),
+  '18': require('../../assets/products/imperial.jpeg'),
   
   // Household Supplies - milk image
-  '19': require('../../assets/products/milk.jpeg'),
-  '20': require('../../assets/products/milk.jpeg'),
-  '21': require('../../assets/products/milk.jpeg'),
+  '19': require('../../assets/products/gain.jpeg'),
+  '20': require('../../assets/products/tissue.jpeg'),
+  '21': require('../../assets/products/poa.jpeg'),
   
   // Deli & Prepared Food - bread image
-  '22': require('../../assets/products/bread.jpeg'),
-  '23': require('../../assets/products/bread.jpeg'),
-  '24': require('../../assets/products/yogurt.jpeg'),
+  '22': require('../../assets/products/chicken.jpeg'),
+  '23': require('../../assets/products/ham.jpeg'),
+  '24': require('../../assets/products/chips.jpeg'),
 };
 
 const CATEGORIES = [
@@ -79,17 +79,17 @@ const PRODUCTS = [
   // Bakery
   { id: '4', name: 'Bread', price: 2.5, category: '2', emoji: '🍞' },
   { id: '5', name: 'Croissant', price: 3.0, category: '2', emoji: '🥐' },
-  { id: '6', name: 'Cake', price: 5.99, category: '2', emoji: '🎂' },
+  { id: '6', name: '1 Piece of Choclate Cake', price: 5.99, category: '2', emoji: '🎂' },
   
   // Pantry/Dry Goods
-  { id: '7', name: 'Rice', price: 2.0, category: '3', emoji: '🍚' },
+  { id: '7', name: 'Nakonde Rice Per kg', price: 2.0, category: '3', emoji: '🍚' },
   { id: '8', name: 'Pasta', price: 1.5, category: '3', emoji: '🍝' },
   { id: '9', name: 'Cereal', price: 3.5, category: '3', emoji: '🥣' },
   
   // Beverages
-  { id: '10', name: 'Orange Juice', price: 3.99, category: '4', emoji: '🧡' },
+  { id: '10', name: 'Fruitop Juice', price: 3.99, category: '4', emoji: '🧡' },
   { id: '11', name: 'Coffee', price: 4.5, category: '4', emoji: '☕' },
-  { id: '12', name: 'Tea', price: 2.99, category: '4', emoji: '🫖' },
+  { id: '12', name: 'Quick Brew Black Tea Bags', price: 2.99, category: '4', emoji: '🫖' },
   
   // Snacks
   { id: '13', name: 'Chips', price: 1.99, category: '5', emoji: '🍟' },

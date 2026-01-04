@@ -19,17 +19,17 @@ interface ProductsScreenProps {
 // Product images mapping - require local PNG files
 const PRODUCT_IMAGES: { [key: string]: any } = {
   '1': require('../../assets/products/milk.jpeg'),
-  '2': require('../../assets/products/bread.jpeg'),
+  '2': require('../../assets/products/cheese.jpeg'),
   '3': require('../../assets/products/yogurt.jpeg'),
   '4': require('../../assets/products/bread.jpeg'),
-  '5': require('../../assets/products/milk.jpeg'),
+  '5': require('../../assets/products/croissant.jpeg'),
   '6': require('../../assets/products/cake.jpeg'),
-  '7': require('../../assets/products/milk.jpeg'),
-  '8': require('../../assets/products/milk.jpeg'),
-  '9': require('../../assets/products/milk.jpeg'),
-  '10': require('../../assets/products/milk.jpeg'),
-  '11': require('../../assets/products/milk.jpeg'),
-  '12': require('../../assets/products/milk.jpeg'),
+  '7': require('../../assets/products/rice.jpeg'),
+  '8': require('../../assets/products/pasta.jpeg'),
+  '9': require('../../assets/products/cereal.jpeg'),
+  '10': require('../../assets/products/fruitop.jpeg'),
+  '11': require('../../assets/products/ricoffy.jpeg'),
+  '12': require('../../assets/products/ricoffy.jpeg'),
 };
 
 const PRODUCTS = [
@@ -39,7 +39,7 @@ const PRODUCTS = [
   { id: '4', name: 'Bread', price: 2.5, category: '2', emoji: '🍞' },
   { id: '5', name: 'Croissant', price: 3.0, category: '2', emoji: '🥐' },
   { id: '6', name: 'Piece of Choclate Cake', price: 5.99, category: '2', emoji: '🎂' },
-  { id: '7', name: 'Rice', price: 2.0, category: '3', emoji: '🍚' },
+  { id: '7', name: 'Nakonde Rice Per kg', price: 2.0, category: '3', emoji: '🍚' },
   { id: '8', name: 'Pasta', price: 1.5, category: '3', emoji: '🍝' },
   { id: '9', name: 'Cereal', price: 3.5, category: '3', emoji: '🥣' },
   { id: '10', name: 'Orange Juice', price: 3.99, category: '4', emoji: '🧃' },
