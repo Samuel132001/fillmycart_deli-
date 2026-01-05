@@ -26,7 +26,7 @@ const PRODUCT_IMAGES: { [key: string]: any } = {
   '6': require('../../assets/products/cake.jpeg'),
   '7': require('../../assets/products/rice.jpeg'),
   '8': require('../../assets/products/pasta.jpeg'),
-  '9': require('../../assets/products/cereal.jpeg'),
+  '9': require('../../assets/products/bread.jpeg'),
   '10': require('../../assets/products/fruitop.jpeg'),
   '11': require('../../assets/products/ricoffy.jpeg'),
   '12': require('../../assets/products/ricoffy.jpeg'),

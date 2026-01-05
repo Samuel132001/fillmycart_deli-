@@ -132,12 +132,24 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Set a timeout to ensure we don't get stuck loading
+    const timeoutId = setTimeout(() => {
+      if (loading) {
+        console.warn('Firebase auth check timeout - proceeding without user');
+        setLoading(false);
+      }
+    }, 5000);
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
+      clearTimeout(timeoutId);
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   if (loading) {
