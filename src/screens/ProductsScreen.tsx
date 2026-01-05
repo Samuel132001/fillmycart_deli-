@@ -75,7 +75,11 @@ export default function ProductsScreen({ navigation }: ProductsScreenProps) {
   };
 
   const renderProduct = ({ item }: { item: any }) => (
-    <View style={styles.productItem}>
+    <TouchableOpacity 
+      style={styles.productItem}
+      onPress={() => navigation.navigate('ProductDetails', { productId: item.id })}
+      activeOpacity={0.9}
+    >
       <Image
         source={PRODUCT_IMAGES[item.id]}
         style={styles.productImage}
@@ -87,10 +91,11 @@ export default function ProductsScreen({ navigation }: ProductsScreenProps) {
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => handleAddToCart(item)}
+        activeOpacity={0.8}
       >
         <Ionicons name="add-circle" size={24} color="#fff" />
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   return (

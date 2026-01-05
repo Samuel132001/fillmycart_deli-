@@ -146,7 +146,11 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   };
 
   const renderProduct = ({ item }: { item: any }) => (
-    <View style={styles.productCard}>
+    <TouchableOpacity 
+      style={styles.productCard}
+      onPress={() => navigation.navigate('ProductDetails', { productId: item.id })}
+      activeOpacity={0.9}
+    >
       <Image
         source={PRODUCT_IMAGES[item.id]}
         style={styles.productImage}
@@ -156,11 +160,12 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => handleAddToCart(item)}
+        activeOpacity={0.8}
       >
         <Ionicons name="add-circle" size={20} color="#fff" />
         <Text style={styles.addButtonText}>Add</Text>
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderCategory = ({ item }: { item: any }) => (

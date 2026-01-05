@@ -15,6 +15,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import CartScreen from './src/screens/CartScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import ProductsScreen from './src/screens/ProductsScreen';
+import ProductDetailsScreen from './src/screens/ProductDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -52,78 +53,98 @@ function MainNavigator() {
     return () => clearInterval(interval);
   }, []);
 
+  function TabNavigator() {
+    return (
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName: any = 'home';
+
+            if (route.name === 'HomeTab') {
+              iconName = focused ? 'home' : 'home-outline';
+            } else if (route.name === 'ProductsTab') {
+              iconName = focused ? 'storefront' : 'storefront-outline';
+            } else if (route.name === 'CartTab') {
+              iconName = focused ? 'cart' : 'cart-outline';
+            } else if (route.name === 'ProfileTab') {
+              iconName = focused ? 'person' : 'person-outline';
+            }
+
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: '#4CAF50',
+          tabBarInactiveTintColor: '#999',
+          tabBarLabelStyle: {
+            fontSize: 12,
+            marginBottom: 4,
+          },
+        })}
+      >
+        <Tab.Screen
+          name="HomeTab"
+          component={HomeScreen}
+          options={{
+            title: 'Home',
+          }}
+          listeners={({ navigation }) => ({
+            tabPress: () => {
+              loadCartCount();
+            },
+          })}
+        />
+        <Tab.Screen
+          name="ProductsTab"
+          component={ProductsScreen}
+          options={{
+            title: 'Products',
+          }}
+          listeners={({ navigation }) => ({
+            tabPress: () => {
+              loadCartCount();
+            },
+          })}
+        />
+        <Tab.Screen
+          name="CartTab"
+          component={CartScreen}
+          options={{
+            title: 'Cart',
+            tabBarBadge: cartCount > 0 ? cartCount : null,
+          }}
+          listeners={({ navigation }) => ({
+            tabPress: () => {
+              loadCartCount();
+            },
+          })}
+        />
+        <Tab.Screen
+          name="ProfileTab"
+          component={ProfileScreen}
+          options={{
+            title: 'Profile',
+          }}
+        />
+      </Tab.Navigator>
+    );
+  }
+
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
+    <Stack.Navigator
+      screenOptions={{
         headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName: any = 'home';
-
-          if (route.name === 'HomeTab') {
-            iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'ProductsTab') {
-            iconName = focused ? 'storefront' : 'storefront-outline';
-          } else if (route.name === 'CartTab') {
-            iconName = focused ? 'cart' : 'cart-outline';
-          } else if (route.name === 'ProfileTab') {
-            iconName = focused ? 'person' : 'person-outline';
-          }
-
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: '#4CAF50',
-        tabBarInactiveTintColor: '#999',
-        tabBarLabelStyle: {
-          fontSize: 12,
-          marginBottom: 4,
-        },
-      })}
+      }}
     >
-      <Tab.Screen
-        name="HomeTab"
-        component={HomeScreen}
+      <Stack.Screen name="MainTabs" component={TabNavigator} />
+      <Stack.Screen
+        name="ProductDetails"
+        component={ProductDetailsScreen}
         options={{
-          title: 'Home',
-        }}
-        listeners={({ navigation }) => ({
-          tabPress: () => {
-            loadCartCount();
-          },
-        })}
-      />
-      <Tab.Screen
-        name="ProductsTab"
-        component={ProductsScreen}
-        options={{
-          title: 'Products',
-        }}
-        listeners={({ navigation }) => ({
-          tabPress: () => {
-            loadCartCount();
-          },
-        })}
-      />
-      <Tab.Screen
-        name="CartTab"
-        component={CartScreen}
-        options={{
-          title: 'Cart',
-          tabBarBadge: cartCount > 0 ? cartCount : null,
-        }}
-        listeners={({ navigation }) => ({
-          tabPress: () => {
-            loadCartCount();
-          },
-        })}
-      />
-      <Tab.Screen
-        name="ProfileTab"
-        component={ProfileScreen}
-        options={{
-          title: 'Profile',
+          animationEnabled: true,
+          gestureEnabled: true,
         }}
       />
-    </Tab.Navigator>
+    </Stack.Navigator>
   );
 }
 
