@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import * as WebBrowser from 'expo-web-browser';
 import { auth } from '../config/firebase';
 
@@ -63,31 +63,12 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   const handleGoogleSignIn = async () => {
     try {
       setLoading(true);
-      
-      // Build the Google OAuth URL
-      const clientId = 'YOUR_GOOGLE_CLIENT_ID'; // This will be replaced with your actual ID
-      const redirectUrl = `${auth.app.options.authDomain}/__/auth/handler`;
-      
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-        `client_id=${clientId}&` +
-        `redirect_uri=${encodeURIComponent(redirectUrl)}&` +
-        `response_type=code&` +
-        `scope=${encodeURIComponent('profile email')}`;
-
-      // Open the browser for Google login
-      const result = await WebBrowser.openAuthSessionAsync(
-        authUrl,
-        redirectUrl
-      );
-
-      if (result.type === 'success') {
-        Alert.alert('Success', 'Google login successful!');
-        // The actual token exchange should be done on your backend
-        // For now, we'll show a success message
-      } else if (result.type === 'dismiss') {
-        Alert.alert('Cancelled', 'Google login was cancelled');
-      }
+      Alert.alert('Info', 'Google Sign-In is not yet configured.\n\nPlease use email/username and password to login.');
       setLoading(false);
+      // Note: To enable Google Sign-In:
+      // 1. Get your Google Client ID from Google Cloud Console
+      // 2. Update the clientId below
+      // 3. Configure OAuth redirect URIs in Google Cloud Console
     } catch (error: any) {
       setLoading(false);
       Alert.alert('Error', 'Failed to login with Google: ' + error.message);

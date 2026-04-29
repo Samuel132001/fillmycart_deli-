@@ -99,18 +99,22 @@ export default function ProductDetailsScreen({
       }
 
       await AsyncStorage.setItem('cart', JSON.stringify(cart));
-      Alert.alert('Success', `${quantity} × ${product.name} added to cart!`);
-      setQuantity(1);
-      setSelectedVariants({});
+      return true; // Return success status
     } catch (error) {
       console.error('Error adding to cart:', error);
       Alert.alert('Error', 'Failed to add item to cart');
+      return false;
     }
   };
 
   const handleBuyNow = async () => {
-    await handleAddToCart();
-    navigation.navigate('CartTab');
+    const success = await handleAddToCart();
+    if (success) {
+      Alert.alert('Success', `${quantity} × ${product.name} added to cart!`);
+      setTimeout(() => {
+        navigation.getParent()?.navigate('CartTab');
+      }, 500);
+    }
   };
 
   const renderVariantGroup = (
