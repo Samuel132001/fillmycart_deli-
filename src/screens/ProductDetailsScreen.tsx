@@ -426,6 +426,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#f0f0f0',
     padding: 12,
+    paddingBottom: 60,
     backgroundColor: '#fff',
   },
   quantityContainer: {

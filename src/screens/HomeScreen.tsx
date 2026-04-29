@@ -8,9 +8,11 @@ import {
   SafeAreaView,
   Alert,
   Image,
+  TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth } from '../config/firebase';
 
 interface HomeScreenProps {
   navigation: any;
@@ -114,10 +116,39 @@ const PRODUCTS = [
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredProducts = selectedCategory
+  useEffect(() => {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      setUser(currentUser);
+    }
+    loadAvatar();
+  }, []);
+
+  const loadAvatar = async () => {
+    try {
+      const savedAvatar = await AsyncStorage.getItem('userAvatar');
+      if (savedAvatar) {
+        setAvatar(savedAvatar);
+      }
+    } catch (error) {
+      console.error('Error loading avatar:', error);
+    }
+  };
+
+  let filteredProducts = selectedCategory
     ? PRODUCTS.filter((p) => p.category === selectedCategory)
     : PRODUCTS;
+
+  // Apply search filter
+  if (searchQuery.trim()) {
+    filteredProducts = filteredProducts.filter((p) =>
+      p.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
 
   const handleAddToCart = async (product: any) => {
     try {
@@ -192,10 +223,53 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>🛒 Fresh Groceries</Text>
+        <View style={styles.headerContent}>
+          <TouchableOpacity style={styles.avatarSection}>
+            {avatar ? (
+              <Image
+                source={{ uri: avatar }}
+                style={styles.avatarImage}
+              />
+            ) : (
+              <Ionicons name="person-circle" size={40} color="#4CAF50" />
+            )}
+          </TouchableOpacity>
+
+          <View style={styles.greetingSection}>
+            <Text style={styles.greetingLabel}>Welcome back,</Text>
+            <Text style={styles.greetingName}>
+              {user?.displayName ? user.displayName.split(' ')[0] : 'User'}
+            </Text>
+          </View>
+
+          <TouchableOpacity style={styles.notificationButton}>
+            <Ionicons name="notifications" size={24} color="#4CAF50" />
+            <View style={styles.notificationBadge}>
+              <Text style={styles.badgeText}>2</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <Text style={styles.sectionTitle}>Categories</Text>
+      <View style={styles.searchContainer}>
+        <View style={styles.searchBar}>
+          <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search groceries"
+            placeholderTextColor="#ccc"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+        <TouchableOpacity style={styles.filterButton}>
+          <Ionicons name="funnel" size={20} color="#4CAF50" />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Categories</Text>
+      </View>
       <FlatList
         data={CATEGORIES}
         renderItem={renderCategory}
@@ -237,65 +311,178 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8f9fa',
   },
   header: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+    paddingTop: 45,
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomWidth: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 1,
   },
-  headerTitle: {
-    fontSize: 20,
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  avatarSection: {
+    marginRight: 12,
+  },
+  avatarImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+  },
+  greetingSection: {
+    flex: 1,
+  },
+  greetingLabel: {
+    fontSize: 12,
+    color: '#999',
+    fontWeight: '500',
+  },
+  greetingName: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#2c3e50',
+    marginTop: 2,
+  },
+  notificationButton: {
+    position: 'relative',
+    padding: 8,
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: '#FF6B6B',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 10,
     fontWeight: 'bold',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 10,
+  },
+  searchBar: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 10,
+    fontSize: 14,
     color: '#333',
+  },
+  filterButton: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  sectionHeader: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginHorizontal: 16,
-    marginTop: 12,
-    marginBottom: 8,
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#2c3e50',
+    marginHorizontal: 0,
+    marginTop: 0,
+    marginBottom: 10,
+    letterSpacing: 0.3,
   },
   categoriesList: {
     paddingHorizontal: 16,
-    paddingBottom: 12,
+    paddingBottom: 16,
+    paddingTop: 4,
   },
   categoryButton: {
     backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    marginRight: 12,
+    borderWidth: 2,
+    borderColor: '#f0f0f0',
     alignItems: 'center',
-    width: 100,
+    justifyContent: 'center',
+    width: 110,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
   },
   categoryButtonActive: {
     backgroundColor: '#4CAF50',
-    borderColor: '#4CAF50',
+    borderColor: '#45a049',
+    shadowColor: '#4CAF50',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 5,
   },
   categoryEmoji: {
-    fontSize: 24,
-    marginBottom: 4,
+    fontSize: 32,
+    marginBottom: 6,
   },
   categoryText: {
-    fontSize: 11,
-    color: '#333',
+    fontSize: 12,
+    color: '#555',
     textAlign: 'center',
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
   categoryTextActive: {
     color: '#fff',
+    fontWeight: '700',
   },
   productsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    marginTop: 8,
+    marginTop: 12,
+    marginBottom: 8,
   },
   clearButton: {
     backgroundColor: '#FF6B6B',

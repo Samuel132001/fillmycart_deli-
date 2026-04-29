@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { onAuthStateChanged } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, Text } from 'react-native';
 import { auth } from './src/config/firebase';
 import LoginScreen from './src/screens/LoginScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
@@ -110,7 +110,7 @@ function MainNavigator() {
           component={CartScreen}
           options={{
             title: 'Cart',
-            tabBarBadge: cartCount > 0 ? cartCount : null,
+            tabBarBadge: cartCount > 0 ? cartCount : undefined,
           }}
           listeners={({ navigation }) => ({
             tabPress: () => {
@@ -140,7 +140,6 @@ function MainNavigator() {
         name="ProductDetails"
         component={ProductDetailsScreen}
         options={{
-          animationEnabled: true,
           gestureEnabled: true,
         }}
       />
@@ -151,43 +150,78 @@ function MainNavigator() {
 export default function App() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Set a timeout to ensure we don't get stuck loading
-    const timeoutId = setTimeout(() => {
-      if (loading) {
-        console.warn('Firebase auth check timeout - proceeding without user');
+    try {
+      // Set a timeout to ensure we don't get stuck loading
+      const timeoutId = setTimeout(() => {
+        if (loading) {
+          console.warn('Firebase auth check timeout - proceeding without user');
+          setLoading(false);
+        }
+      }, 5000);
+
+      console.log('Initializing Firebase auth...');
+      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        console.log('Auth state changed:', currentUser ? 'User logged in' : 'No user');
+        setUser(currentUser);
         setLoading(false);
-      }
-    }, 5000);
+        clearTimeout(timeoutId);
+      }, (error) => {
+        console.error('Auth error:', error);
+        setError(error.message);
+        setLoading(false);
+        clearTimeout(timeoutId);
+      });
 
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+      return () => {
+        unsubscribe();
+        clearTimeout(timeoutId);
+      };
+    } catch (err: any) {
+      console.error('Error in App useEffect:', err);
+      setError(err.message);
       setLoading(false);
-      clearTimeout(timeoutId);
-    });
-
-    return () => {
-      unsubscribe();
-      clearTimeout(timeoutId);
-    };
+    }
   }, []);
+  
+
+  if (error) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+        <Text style={{ fontSize: 16, color: '#d32f2f', textAlign: 'center', paddingHorizontal: 20 }}>
+          Error initializing app: {error}
+        </Text>
+      </View>
+    );
+  }
 
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#4CAF50" />
+        <Text style={{ marginTop: 16, color: '#666' }}>Loading...</Text>
       </View>
     );
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      onReady={() => console.log('NavigationContainer ready')}
+      onStateChange={(state) => console.log('Navigation state:', state)}
+    >
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
-          <Stack.Screen name="MainApp" component={MainNavigator} />
+          <Stack.Screen 
+            name="MainApp" 
+            component={MainNavigator}
+          />
         ) : (
-          <Stack.Screen name="Auth" component={AuthNavigator} />
+          <Stack.Screen 
+            name="Auth" 
+            component={AuthNavigator}
+          />
         )}
       </Stack.Navigator>
       <StatusBar style="auto" />

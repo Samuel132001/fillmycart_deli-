@@ -11,7 +11,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../config/firebase';
 
 interface SignUpScreenProps {
@@ -19,14 +19,20 @@ interface SignUpScreenProps {
 }
 
 export default function SignUpScreen({ navigation }: SignUpScreenProps) {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = () => {
-    if (!email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    if (name.length < 2) {
+      Alert.alert('Error', 'Name must be at least 2 characters');
       return;
     }
 
@@ -51,9 +57,18 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
 
     setLoading(true);
     createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+      .then(async (userCredential) => {
+        // Update user profile with display name
+        try {
+          await updateProfile(userCredential.user, {
+            displayName: name,
+          });
+        } catch (profileError) {
+          console.error('Error updating profile:', profileError);
+        }
         setLoading(false);
-        Alert.alert('Success', 'Account created successfully!');
+        Alert.alert('Success', `Welcome ${name}! Account created successfully!`);
+        setName('');
         setEmail('');
         setPassword('');
         setConfirmPassword('');
@@ -80,6 +95,16 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
           <Text style={styles.subtitle}>Join our grocery store</Text>
 
           <View style={styles.form}>
+            <Text style={styles.label}>Full Name</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your full name"
+              value={name}
+              onChangeText={setName}
+              autoCapitalize="words"
+              editable={!loading}
+            />
+
             <Text style={styles.label}>Email</Text>
             <TextInput
               style={styles.input}

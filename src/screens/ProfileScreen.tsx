@@ -7,8 +7,11 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { signOut } from 'firebase/auth';
 import { auth } from '../config/firebase';
 
@@ -18,14 +21,82 @@ interface ProfileScreenProps {
 
 export default function ProfileScreen({ navigation }: ProfileScreenProps) {
   const [user, setUser] = useState<any>(null);
+  const [avatar, setAvatar] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingAvatar, setLoadingAvatar] = useState(false);
 
   useEffect(() => {
     const currentUser = auth.currentUser;
     if (currentUser) {
       setUser(currentUser);
     }
+    loadAvatar();
   }, []);
+
+  const loadAvatar = async () => {
+    try {
+      const savedAvatar = await AsyncStorage.getItem('userAvatar');
+      if (savedAvatar) {
+        setAvatar(savedAvatar);
+      }
+    } catch (error) {
+      console.error('Error loading avatar:', error);
+    }
+  };
+
+  const pickImage = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      if (!permissionResult.granted) {
+        Alert.alert('Permission Denied', 'Permission to access photos is required');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.7,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const imageUri = result.assets[0].uri;
+        setLoadingAvatar(true);
+        
+        try {
+          await AsyncStorage.setItem('userAvatar', imageUri);
+          setAvatar(imageUri);
+          Alert.alert('Success', 'Avatar updated successfully!');
+        } catch (storageError) {
+          Alert.alert('Error', 'Failed to save avatar');
+        } finally {
+          setLoadingAvatar(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Alert.alert('Error', 'Failed to pick image');
+    }
+  };
+
+  const removeAvatar = async () => {
+    Alert.alert('Remove Avatar', 'Are you sure you want to remove your avatar?', [
+      { text: 'Cancel', onPress: () => {} },
+      {
+        text: 'Remove',
+        onPress: async () => {
+          try {
+            await AsyncStorage.removeItem('userAvatar');
+            setAvatar(null);
+            Alert.alert('Success', 'Avatar removed');
+          } catch (error) {
+            Alert.alert('Error', 'Failed to remove avatar');
+          }
+        },
+      },
+    ]);
+  };
 
   const handleLogout = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
@@ -64,13 +135,66 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.profileCard}>
           <View style={styles.avatarContainer}>
-            <Ionicons name="person-circle" size={80} color="#4CAF50" />
+            {avatar ? (
+              <>
+                <Image
+                  source={{ uri: avatar }}
+                  style={styles.avatarImage}
+                />
+                <TouchableOpacity
+                  style={styles.changeAvatarBadge}
+                  onPress={pickImage}
+                  disabled={loadingAvatar}
+                >
+                  {loadingAvatar ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Ionicons name="camera" size={16} color="#fff" />
+                  )}
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <Ionicons name="person-circle" size={80} color="#4CAF50" />
+                <TouchableOpacity
+                  style={styles.addAvatarBadge}
+                  onPress={pickImage}
+                  disabled={loadingAvatar}
+                >
+                  {loadingAvatar ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Ionicons name="add" size={18} color="#fff" />
+                  )}
+                </TouchableOpacity>
+              </>
+            )}
           </View>
 
           <Text style={styles.userName}>
             {user?.displayName || 'User'}
           </Text>
           <Text style={styles.userEmail}>{user?.email}</Text>
+
+          <View style={styles.avatarButtonsRow}>
+            <TouchableOpacity
+              style={styles.avatarButton}
+              onPress={pickImage}
+              disabled={loadingAvatar}
+            >
+              <Ionicons name="camera" size={16} color="#fff" />
+              <Text style={styles.avatarButtonText}>Change</Text>
+            </TouchableOpacity>
+            {avatar && (
+              <TouchableOpacity
+                style={[styles.avatarButton, styles.removeButton]}
+                onPress={removeAvatar}
+              >
+                <Ionicons name="trash" size={16} color="#fff" />
+                <Text style={styles.avatarButtonText}>Remove</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         <View style={styles.section}>
@@ -185,6 +309,65 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     marginBottom: 12,
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#f0f0f0',
+    borderWidth: 3,
+    borderColor: '#4CAF50',
+  },
+  changeAvatarBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#4CAF50',
+    borderRadius: 20,
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#fff',
+  },
+  addAvatarBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#4CAF50',
+    borderRadius: 20,
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#fff',
+  },
+  avatarButtonsRow: {
+    flexDirection: 'row',
+    marginTop: 16,
+    gap: 8,
+  },
+  avatarButton: {
+    flexDirection: 'row',
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    alignItems: 'center',
+    gap: 6,
+  },
+  removeButton: {
+    backgroundColor: '#FF6B6B',
+  },
+  avatarButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
   userName: {
     fontSize: 22,
