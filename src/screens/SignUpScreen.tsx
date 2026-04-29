@@ -56,13 +56,17 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
     }
 
     setLoading(true);
+    console.log('Attempting signup with email:', email);
+    
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
+        console.log('Signup successful:', userCredential.user.email);
         // Update user profile with display name
         try {
           await updateProfile(userCredential.user, {
             displayName: name,
           });
+          console.log('Profile updated with name:', name);
         } catch (profileError) {
           console.error('Error updating profile:', profileError);
         }
@@ -75,6 +79,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
         // Navigation to home will be handled by App.tsx when auth state changes
       })
       .catch((error) => {
+        console.error('Signup error:', error.code, error.message);
         setLoading(false);
         Alert.alert('Sign Up Error', error.message);
       });

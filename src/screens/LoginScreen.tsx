@@ -12,10 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import * as WebBrowser from 'expo-web-browser';
 import { auth } from '../config/firebase';
-
-WebBrowser.maybeCompleteAuthSession();
 
 interface LoginScreenProps {
   navigation: any;
@@ -46,8 +43,11 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     // For Firebase, we need an email. If username is provided, append a domain
     const firebaseEmail = isEmail ? emailOrUsername : `${emailOrUsername}@grocery-app.local`;
     
+    console.log('Attempting login with:', firebaseEmail);
+    
     signInWithEmailAndPassword(auth, firebaseEmail, password)
       .then((userCredential) => {
+        console.log('Login successful:', userCredential.user.email);
         setLoading(false);
         Alert.alert('Success', `Welcome back!`);
         setEmailOrUsername('');
@@ -55,6 +55,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         // Navigation to home will be handled by App.tsx when auth state changes
       })
       .catch((error) => {
+        console.error('Login error:', error.code, error.message);
         setLoading(false);
         Alert.alert('Login Error', error.message);
       });
